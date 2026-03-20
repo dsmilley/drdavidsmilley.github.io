@@ -1,6 +1,6 @@
 ---
 permalink: /
-title: "UNDER CONSTRUCTION"
+title: "David S. Milley, PhD | Anthropological Archaeology"
 author_profile: true
 redirect_from: 
   - /about/
