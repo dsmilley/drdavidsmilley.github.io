@@ -2,25 +2,24 @@
    Various functions that we want to use within the template
    ========================================================================== */
 
-// Determine the expected state of the theme toggle, which can be "dark", "light", or
-// "system". Default is "system".
+// Determine the expected state of the theme toggle
 let determineThemeSetting = () => {
   let themeSetting = localStorage.getItem("theme");
   return (themeSetting != "dark" && themeSetting != "light" && themeSetting != "system") ? "system" : themeSetting;
 };
 
-// Determine the computed theme, which can be "dark" or "light". If the theme setting is
-// "system", the computed theme is determined based on the user's system preference.
+// Determine the computed theme. 
 let determineComputedTheme = () => {
   let themeSetting = determineThemeSetting();
   if (themeSetting != "system") {
     return themeSetting;
   }
-  return (userPref && userPref("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  // FORCED DEFAULT: Always return dark instead of checking OS preference
+  return "dark"; 
 };
 
-// detect OS/browser preference
-const browserPref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+// FORCED DEFAULT: Hardcode the browser fallback to dark
+const browserPref = 'dark';
 
 // Set the theme on page load or when explicitly called
 let setTheme = (theme) => {
@@ -51,9 +50,7 @@ var toggleTheme = () => {
    Plotly integration script so that Markdown codeblocks will be rendered
    ========================================================================== */
 
-// Read the Plotly data from the code block, hide it, and render the chart as new node. This allows for the 
-// JSON data to be retrieve when the theme is switched. The listener should only be added if the data is 
-// actually present on the page.
+// Read the Plotly data from the code block, hide it, and render the chart as new node.
 import { plotlyDarkLayout, plotlyLightLayout } from './theme.js';
 let plotlyElements = document.querySelectorAll("pre>code.language-plotly");
 if (plotlyElements.length > 0) {
@@ -86,18 +83,15 @@ if (plotlyElements.length > 0) {
    ========================================================================== */
 
 $(document).ready(function () {
-  // SCSS SETTINGS - These should be the same as the settings in the relevant files 
-  const scssLarge = 925;          // pixels, from /_sass/_themes.scss
-  const scssMastheadHeight = 70;  // pixels, from the current theme (e.g., /_sass/theme/_default.scss)
+  // SCSS SETTINGS
+  const scssLarge = 925;          
+  const scssMastheadHeight = 70;  
 
-  // If the user hasn't chosen a theme, follow the OS preference
+  // Set the default theme (now forced to dark)
   setTheme();
-  window.matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener("change", (e) => {
-          if (!localStorage.getItem("theme")) {
-            setTheme(e.matches ? "dark" : "light");
-          }
-        });
+  
+  // NOTE: The OS preference event listener was removed here so it doesn't 
+  // automatically revert to light mode if the user's OS is set to light.
 
   // Enable the theme toggle
   $('#theme-toggle').on('click', toggleTheme);
@@ -134,7 +128,7 @@ $(document).ready(function () {
     }
   });
 
-  // Init smooth scroll, this needs to be slightly more than then fixed masthead height
+  // Init smooth scroll
   $("a").smoothScroll({
     offset: -scssMastheadHeight,
     preventDefault: false,
